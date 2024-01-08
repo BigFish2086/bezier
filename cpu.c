@@ -59,7 +59,7 @@ Vec2 beziern_sample(Vec2 *ps, size_t n, float p)
     Vec2 result = vec2(0, 0);
     for(size_t i = 0; i < n; ++i) {
 #ifdef CACH_NCR
-      float coeff = ncr[m][i] * powf(q, (m-i)) * powf(p, i);
+      float coeff = lookup_pascal_triangle(ncr, m, i) * powf(q, (m-i)) * powf(p, i);
 #else 
       float coeff = binomial_coeff(m, i) * powf(q, (m-i)) * powf(p, i);
 #endif // CACH_NCR

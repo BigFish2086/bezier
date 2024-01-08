@@ -89,14 +89,16 @@ Vec2 lerpv2(Vec2 a, Vec2 b, float p)
 
 void init_pascal_triangle(uint32_t **C, size_t maxn)
 {
-  for (size_t n = 0; n <= maxn; ++n) {
-    C[n] = (uint32_t *)malloc((n + 1) * sizeof(uint32_t));
-    C[n][0] = 1;
-    for (size_t k = 1; k < n; ++k) {
-      C[n][k] = C[n - 1][k - 1] + C[n - 1][k];
+    for (size_t n = 0; n <= maxn; ++n) {
+        C[n] = (uint32_t *)malloc((n/2 + 1 + 1) * sizeof(uint32_t));
+        C[n][0] = 1;
+        for (size_t k = 1; k < n / 2 + 1; ++k) {
+            C[n][k] = C[n - 1][k - 1] + C[n - 1][k];
+        }
+        if (n != 0 && n % 2 == 0) {
+            C[n][n / 2] = 2 * C[n - 1][n / 2 - 1];
+        }
     }
-    C[n][n] = 1;
-  }
 }
 
 void free_pascal_triangle(uint32_t **C, size_t maxn)
@@ -105,6 +107,11 @@ void free_pascal_triangle(uint32_t **C, size_t maxn)
     free(C[n]);
   }
   free(C);
+}
+
+uint32_t lookup_pascal_triangle(uint32_t **C, size_t row, size_t col)
+{
+  return col <= row / 2 ? C[row][col] : C[row][row - col];
 }
 
 int binomial_coeff(int n, int r) 
