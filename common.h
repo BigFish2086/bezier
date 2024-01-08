@@ -87,6 +87,16 @@ Vec2 lerpv2(Vec2 a, Vec2 b, float p)
     return vec2_add(a, vec2_scale(vec2_sub(b, a), p));
 }
 
+int binomial_coeff(int n, int r) 
+{
+    int res = 1;
+    for (int i = 0; i < r; i++) {
+        res = res * (n - i);
+        res = res / (i + 1);
+    }
+    return res;
+}
+
 char *cstr_slurp_file(const char *file_path)
 {
     FILE *f = fopen(file_path, "r");

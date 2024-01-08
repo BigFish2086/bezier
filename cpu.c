@@ -41,36 +41,34 @@ void render_marker(SDL_Renderer *renderer, Vec2 pos, uint32_t color)
         color);
 }
 
-Vec2 beziern_sample(Vec2 *ps, Vec2 *xs, size_t n, float p)
+Vec2 beziern_sample(Vec2 *ps, size_t n, float p)
 {
-    memcpy(xs, ps, sizeof(Vec2) * n);
-
-    while (n > 1) {
-        for (size_t i = 0; i < n - 1; ++i) {
-            xs[i] = lerpv2(xs[i], xs[i + 1], p);
-        }
-        n -= 1;
+    float q = 1 - p;
+    float m = n - 1;
+    Vec2 result = vec2(0, 0);
+    for(size_t i = 0; i < n; ++i) {
+      float coeff = binomial_coeff(m, i) * powf(q, (m-i)) * powf(p, i);
+      result = vec2_add(result, vec2_scale(ps[i], coeff));
     }
-
-    return xs[0];
+    return result;
 }
 
 void render_bezier_markers(SDL_Renderer *renderer,
-                           Vec2 *ps, Vec2 *xs, size_t n,
+                           Vec2 *ps, size_t n,
                            float s, uint32_t color)
 {
     for (float p = 0.0f; p <= 1.0f; p += s) {
-        render_marker(renderer, beziern_sample(ps, xs, n, p), color);
+        render_marker(renderer, beziern_sample(ps, n, p), color);
     }
 }
 
 void render_bezier_curve(SDL_Renderer *renderer,
-                         Vec2 *ps, Vec2 *xs, size_t n,
+                         Vec2 *ps, size_t n,
                          float s, uint32_t color)
 {
     for (float p = 0.0f; p <= 1.0f; p += s) {
-        Vec2 begin = beziern_sample(ps, xs, n, p);
-        Vec2 end = beziern_sample(ps, xs, n, p + s);
+        Vec2 begin = beziern_sample(ps, n, p);
+        Vec2 end = beziern_sample(ps, n, p + s);
         render_line(renderer, begin, end, color);
     }
 }
@@ -78,7 +76,6 @@ void render_bezier_curve(SDL_Renderer *renderer,
 #define PS_CAPACITY 256
 
 Vec2 ps[PS_CAPACITY];
-Vec2 xs[PS_CAPACITY];
 size_t ps_count = 0;
 int ps_selected = -1;
 
@@ -186,13 +183,13 @@ int main(void)
             if (markers) {
                 render_bezier_markers(
                     renderer,
-                    ps, xs, ps_count,
+                    ps, ps_count,
                     bezier_sample_step,
                     GREEN_COLOR);
             } else {
                 render_bezier_curve(
                     renderer,
-                    ps, xs, ps_count,
+                    ps, ps_count,
                     bezier_sample_step,
                     GREEN_COLOR);
             }
