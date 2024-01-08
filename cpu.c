@@ -1,11 +1,11 @@
 #include "./common.h"
 
-#define CACHE_BINOMIAL_COEFFICIENT
+#define CACH_NCR
 #define PS_CAPACITY 256
 
-#ifdef CACHE_BINOMIAL_COEFFICIENT
-uint32_t cached_pascal_triangle[(PS_CAPACITY+1) * (PS_CAPACITY+1)];
-#endif // CACHE_BINOMIAL_COEFFICIENT
+#ifdef CACH_NCR
+uint32_t **ncr; 
+#endif // CACH_NCR
 
 Vec2 ps[PS_CAPACITY];
 size_t ps_count = 0;
@@ -58,11 +58,11 @@ Vec2 beziern_sample(Vec2 *ps, size_t n, float p)
     int m = n - 1;
     Vec2 result = vec2(0, 0);
     for(size_t i = 0; i < n; ++i) {
-#ifdef CACHE_BINOMIAL_COEFFICIENT
-      float coeff = cached_pascal_triangle[i + m*PS_CAPACITY] * powf(q, (m-i)) * powf(p, i);
+#ifdef CACH_NCR
+      float coeff = ncr[m][i] * powf(q, (m-i)) * powf(p, i);
 #else 
       float coeff = binomial_coeff(m, i) * powf(q, (m-i)) * powf(p, i);
-#endif // CACHE_BINOMIAL_COEFFICIENT
+#endif // CACH_NCR
       result = vec2_add(result, vec2_scale(ps[i], coeff));
     }
     return result;
@@ -104,9 +104,10 @@ int ps_at(Vec2 pos)
 
 int main(void)
 {
-#ifdef CACHE_BINOMIAL_COEFFICIENT
-    init_pascal_triangle(cached_pascal_triangle, PS_CAPACITY);
-#endif // CACHE_BINOMIAL_COEFFICIENT
+#ifdef CACH_NCR
+  ncr = (uint32_t **)malloc((PS_CAPACITY + 1) * sizeof(uint32_t *));
+  init_pascal_triangle(ncr, PS_CAPACITY);
+#endif // CACH_NCR
 
     check_sdl_code(
         SDL_Init(SDL_INIT_VIDEO));
@@ -220,6 +221,10 @@ int main(void)
         SDL_Delay(DELTA_TIME_MS);
         t += DELTA_TIME_SEC;
     }
+
+#ifdef CACH_NCR
+  free_pascal_triangle(ncr, PS_CAPACITY);
+#endif // CACH_NCR
 
     SDL_Quit();
 
