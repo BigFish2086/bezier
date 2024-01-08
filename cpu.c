@@ -1,5 +1,16 @@
 #include "./common.h"
 
+#define CACHE_BINOMIAL_COEFFICIENT
+#define PS_CAPACITY 256
+
+#ifdef CACHE_BINOMIAL_COEFFICIENT
+uint32_t cached_pascal_triangle[(PS_CAPACITY+1) * (PS_CAPACITY+1)];
+#endif // CACHE_BINOMIAL_COEFFICIENT
+
+Vec2 ps[PS_CAPACITY];
+size_t ps_count = 0;
+int ps_selected = -1;
+
 void render_line(SDL_Renderer *renderer,
                  Vec2 begin, Vec2 end,
                  uint32_t color)
@@ -44,10 +55,14 @@ void render_marker(SDL_Renderer *renderer, Vec2 pos, uint32_t color)
 Vec2 beziern_sample(Vec2 *ps, size_t n, float p)
 {
     float q = 1 - p;
-    float m = n - 1;
+    int m = n - 1;
     Vec2 result = vec2(0, 0);
     for(size_t i = 0; i < n; ++i) {
+#ifdef CACHE_BINOMIAL_COEFFICIENT
+      float coeff = cached_pascal_triangle[i + m*PS_CAPACITY] * powf(q, (m-i)) * powf(p, i);
+#else 
       float coeff = binomial_coeff(m, i) * powf(q, (m-i)) * powf(p, i);
+#endif // CACHE_BINOMIAL_COEFFICIENT
       result = vec2_add(result, vec2_scale(ps[i], coeff));
     }
     return result;
@@ -73,12 +88,6 @@ void render_bezier_curve(SDL_Renderer *renderer,
     }
 }
 
-#define PS_CAPACITY 256
-
-Vec2 ps[PS_CAPACITY];
-size_t ps_count = 0;
-int ps_selected = -1;
-
 int ps_at(Vec2 pos)
 {
     const Vec2 ps_size = vec2(MARKER_SIZE, MARKER_SIZE);
@@ -95,6 +104,10 @@ int ps_at(Vec2 pos)
 
 int main(void)
 {
+#ifdef CACHE_BINOMIAL_COEFFICIENT
+    init_pascal_triangle(cached_pascal_triangle, PS_CAPACITY);
+#endif // CACHE_BINOMIAL_COEFFICIENT
+
     check_sdl_code(
         SDL_Init(SDL_INIT_VIDEO));
 

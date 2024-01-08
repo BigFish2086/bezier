@@ -87,6 +87,17 @@ Vec2 lerpv2(Vec2 a, Vec2 b, float p)
     return vec2_add(a, vec2_scale(vec2_sub(b, a), p));
 }
 
+void init_pascal_triangle(uint32_t *C, size_t maxn)
+{
+  C[0] = 1;
+  for (size_t n = 0; n <= maxn; ++n) {
+    C[n] = C[n + n*maxn] = 1;
+    for (size_t k = 0; k < n; ++k) {
+      C[k + n*maxn] = C[(k-1) + (n-1)*maxn] + C[k + (n-1)*maxn];
+    }
+  }
+}
+
 int binomial_coeff(int n, int r) 
 {
     int res = 1;
