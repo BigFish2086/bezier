@@ -143,8 +143,16 @@ int main(void)
 
             case SDL_KEYDOWN: {
                 switch (event.key.keysym.sym) {
-                case SDLK_F1: {
+                case SDLK_q: {
+                    quit = 1;
+                } break;
+                case SDLK_r: {
                     markers = !markers;
+                } break;
+                case SDLK_u: {
+                    if (ps_count > 0) {
+                      ps_count--;
+                    }
                 } break;
                 }
             } break;
