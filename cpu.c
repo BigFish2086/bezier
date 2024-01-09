@@ -1,10 +1,9 @@
 #include "./common.h"
 
-#define CACH_NCR
-#define PS_CAPACITY 256
+#define PS_CAPACITY 64
 
 #ifdef CACH_NCR
-uint32_t **ncr; 
+uint64_t **ncr; 
 #endif // CACH_NCR
 
 Vec2 ps[PS_CAPACITY];
@@ -105,7 +104,7 @@ int ps_at(Vec2 pos)
 int main(void)
 {
 #ifdef CACH_NCR
-  ncr = (uint32_t **)malloc((PS_CAPACITY + 1) * sizeof(uint32_t *));
+  ncr = (uint64_t **)malloc((PS_CAPACITY + 1) * sizeof(uint64_t *));
   init_pascal_triangle(ncr, PS_CAPACITY);
 #endif // CACH_NCR
 

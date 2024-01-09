@@ -1,6 +1,8 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
+#define CACH_NCR
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -87,10 +89,11 @@ Vec2 lerpv2(Vec2 a, Vec2 b, float p)
     return vec2_add(a, vec2_scale(vec2_sub(b, a), p));
 }
 
-void init_pascal_triangle(uint32_t **C, size_t maxn)
+#ifdef CACH_NCR
+void init_pascal_triangle(uint64_t **C, size_t maxn)
 {
     for (size_t n = 0; n <= maxn; ++n) {
-        C[n] = (uint32_t *)malloc((n/2 + 1 + 1) * sizeof(uint32_t));
+        C[n] = (uint64_t *)malloc((n/2 + 1 + 1) * sizeof(uint64_t));
         C[n][0] = 1;
         for (size_t k = 1; k < n / 2 + 1; ++k) {
             C[n][k] = C[n - 1][k - 1] + C[n - 1][k];
@@ -101,7 +104,7 @@ void init_pascal_triangle(uint32_t **C, size_t maxn)
     }
 }
 
-void free_pascal_triangle(uint32_t **C, size_t maxn)
+void free_pascal_triangle(uint64_t **C, size_t maxn)
 {
   for (size_t n = 0; n <= maxn; ++n) {
     free(C[n]);
@@ -109,20 +112,22 @@ void free_pascal_triangle(uint32_t **C, size_t maxn)
   free(C);
 }
 
-uint32_t lookup_pascal_triangle(uint32_t **C, size_t row, size_t col)
+uint32_t lookup_pascal_triangle(uint64_t **C, size_t row, size_t col)
 {
   return col <= row / 2 ? C[row][col] : C[row][row - col];
 }
 
-int binomial_coeff(int n, int r) 
+#else
+uint64_t binomial_coeff(int n, int r) 
 {
-    int res = 1;
+    uint64_t res = 1;
     for (int i = 0; i < r; i++) {
         res = res * (n - i);
         res = res / (i + 1);
     }
     return res;
 }
+#endif // CACH_NCR
 
 char *cstr_slurp_file(const char *file_path)
 {
